@@ -3,6 +3,11 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import VueQrcodeReader from 'vue-qrcode-reader'
+import 'vue-qrcode-reader/dist/vue-qrcode-reader.css'
+import 'vue-qrcode-reader/dist/vue-qrcode-reader.browser.js'
+
+Vue.use(VueQrcodeReader)
 
 Vue.config.productionTip = false
 
