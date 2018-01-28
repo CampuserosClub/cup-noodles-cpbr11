@@ -1,11 +1,10 @@
 <template>
-  <div id="app">
-    TODO
+  <div>
+    TOOD
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
 }
 </script>
