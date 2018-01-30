@@ -1,20 +1,39 @@
 <template>
   <div class="row text-center border-top pt-3">
-    <div class="col-md-12" v-if="!paused">
-      <qrcode-reader
-        @decode="onDecode"
-        :paused="paused"
-        :video-constraints="video"/>
+    <div class="col-md-12" v-if="error">
+      Ops!
+      <br/>Não conseguimos identificar a sua câmera.<br/>
+      Vá nas configurações do seu navegador e permita o acesso.<br/><br/>
+      :D
     </div>
     <div class="col-md-12" v-else>
-      <div v-if="campaign.active">
-        O dígito <span class="badge badge-dark">{{ campaign.order }} / 4</span> da senha do cofre é:<br/><br/>
-        <span class="badge badge-dark badge-big">{{ campaign.secret }}</span><br/><br/>
-        <span v-if="campaign.order === 4">Vá correndo para abrir o cofre e pegar sua recompensa!</span>
-        <span v-else>Acompanhe o nosso twitter para achar os outros dígitos :D</span>
+      <div class="col-md-12" v-if="allowed">
+        <div v-if="!paused">
+          <qrcode-reader
+            @init="onInit"
+            @decode="onDecode"
+            :paused="paused"
+            :video-constraints="video"/>
+        </div>
+        <div v-else>
+          <div v-if="campaign.active">
+            O dígito <span class="badge badge-dark">{{ campaign.order }} / 4</span> da senha do cofre é:<br/><br/>
+            <span class="badge badge-dark badge-big">{{ campaign.secret }}</span><br/><br/>
+            <span v-if="campaign.order === 4">Vá correndo para abrir o cofre e pegar sua recompensa!</span>
+            <span v-else>
+              Acompanhe o nosso twitter para achar os outros dígitos<br/><br/>
+              <a href="https://twitter.com/CupNoodles_BR" target="_blank" class="badge badge-dark">@CupNoodles_BR</a>
+            </span>
+          </div>
+          <div v-else>
+            Ops!<br/>Outra pessoa conseguiu a senha antes de você.
+          </div>
+        </div>
       </div>
-      <div v-else>
-        Ops!<br/>Outra pessoa conseguiu a senha antes de você.
+      <div class="col-md-12" v-else>
+        Olá c@mpusero!<br/><br/>
+        Já achou algum QR code? Se sim, basta clicar no botão abaixo para descobrir um dos dígitos do cofre.<br/><br/>
+        <button type="button" class="btn btn-default badge-dark" @click.prevent="allowed = true">LER QR CODE</button>
       </div>
     </div>
   </div>
@@ -25,7 +44,9 @@ export default {
   data () {
     return {
       paused: false,
+      allowed: false,
       campaign: null,
+      error: false,
       video: {
         facingMode: { ideal: 'environment' },
         width: { ideal: 300 },
@@ -34,6 +55,14 @@ export default {
     }
   },
   methods: {
+    async onInit (promise) {
+      try {
+        await promise
+      } catch (error) {
+        this.paused = true
+        this.error = true
+      }
+    },
     onDecode (content) {
       this.$db.collection('campaigns').doc(content).get().then(campaign => {
         if (!campaign.exists) return alert('QR code inválido')
