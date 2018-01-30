@@ -4,7 +4,11 @@
       Ops!
       <br/>Não conseguimos identificar a sua câmera.<br/>
       Vá nas configurações do seu navegador e permita o acesso.<br/><br/>
-      :D
+      Ou, use um leitor de QR code externo:<br/><br/>
+      <form @submit.prevent="submit">
+        <input type="text" placeholder="Cole ou digite o QR code aqui" class="form-control" v-model="qrCode"/><br/>
+        <button type="submit" class="btn badge-dark">ok</button>
+      </form>
     </div>
     <div class="col-md-12" v-else>
       <div class="col-md-12" v-if="allowed">
@@ -47,6 +51,7 @@ export default {
       allowed: false,
       campaign: null,
       error: false,
+      qrCode: '',
       video: {
         facingMode: { ideal: 'environment' },
         width: { ideal: 300 },
@@ -70,6 +75,11 @@ export default {
         this.paused = true
         this.campaign = campaign.data()
       })
+    },
+    submit () {
+      this.error = false
+      this.paused = true
+      this.onDecode(this.qrCode)
     }
   }
 }
