@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-md-12 text-center">
-      <img src="~@/assets/logo-cn.png" class="logo-cn my-5"/>
+      <img src="~@/assets/logo-cn.png" class="logo-cn mt-5 mb-3"/>
       <h2>#DescubraCup<br/><small>#CPBR11</small></h2>
     </div>
   </div>
@@ -14,6 +14,6 @@ export default {
 
 <style scoped>
 .logo-cn {
-  width: 150px;
+  width: 200px;
 }
 </style>
