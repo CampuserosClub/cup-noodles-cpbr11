@@ -7,8 +7,15 @@
         :video-constraints="video"/>
     </div>
     <div class="col-md-12" v-else>
-      O dígito <span class="badge badge-dark">{{ secret.current }} / {{ total }}</span> do cofre é:<br/><br/>
-      <span class="badge badge-dark badge-big">{{ secret.key }}</span>
+      <div v-if="campaign.active">
+        O dígito <span class="badge badge-dark">{{ campaign.order }} / 4</span> da senha do cofre é:<br/><br/>
+        <span class="badge badge-dark badge-big">{{ campaign.secret }}</span><br/><br/>
+        <span v-if="campaign.order === 4">Vá correndo para abrir o cofre e pegar sua recompensa!</span>
+        <span v-else>Acompanhe o nosso twitter para achar os outros dígitos :D</span>
+      </div>
+      <div v-else>
+        Ops!<br/>Outra pessoa conseguiu a senha antes de você.
+      </div>
     </div>
   </div>
 </template>
@@ -18,12 +25,7 @@ export default {
   data () {
     return {
       paused: false,
-      hash: null,
-      total: 4,
-      secret: {
-        current: 1,
-        key: 5
-      },
+      campaign: null,
       video: {
         facingMode: { ideal: 'environment' },
         width: { ideal: 300 },
@@ -33,13 +35,12 @@ export default {
   },
   methods: {
     onDecode (content) {
-      console.log(content)
-      if (content === 'hash-unico') {
+      this.$db.collection('campaigns').doc(content).get().then(campaign => {
+        if (!campaign.exists) return alert('QR code inválido')
+
         this.paused = true
-        this.hash = content
-      } else {
-        alert('qr code invalido, tente novamente')
-      }
+        this.campaign = campaign.data()
+      })
     }
   }
 }
@@ -47,8 +48,9 @@ export default {
 
 <style>
 .badge-big {
-  font-size: 10em;
-  padding: 1rem 3rem!important;
+  font-size: 5em;
+  letter-spacing: 10px;
+  padding: 1rem 1rem!important;
   border-radius: 1rem;
 }
 .qrcode-reader {
